@@ -1,31 +1,27 @@
 const { app, BrowserWindow, BrowserView } = require("electron");
 
 const init = () => {
-	let j = 0;
-	const interval = setInterval(() => {
-		j++;
-		if (j > 0) {
-			clearInterval(interval);
-		}
-		for(let i = 0; i < 1; i++) {
-			console.log(`bw count: ${i}`)
-			let browserWindow = new BrowserWindow({
-				show: true,
-			});
-
-			browserWindow.loadURL(`https://www.google.com?count=${1}`)
-
-			browserWindow.once('ready-to-show', () => {
-			  	browserWindow.show();
-				if (i > 0) {
-					browserWindow.close();
-				}
-			});
-		}
-	}, 1000);
-
+	reloadWin(1000);
 };
 
+const reloadWin = (count) => {
+	console.log(`reloadWin count: ${count}`);
+
+	let browserWindow = new BrowserWindow({
+		show: true,
+	});
+	browserWindow.loadURL(`https://www.google.com?count=${count}`)
+
+	browserWindow.once('ready-to-show', () => {
+		browserWindow.loadURL("about:blank");
+		if (count > 0) {
+			browserWindow.once('ready-to-show', () => {
+				reloadWin(count-1);
+				browserWindow.close();
+			});
+		}
+	});
+}
 
 setInterval(() => {
 	if (global.gc) {
